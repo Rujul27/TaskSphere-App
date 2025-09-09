@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/icons/icon-192x192.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#60A5FA" />
+  <meta name="description" content="TaskSphere - Organize your tasks in spheres with priority-based color coding" />
+
+
+  <!-- Apple PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="TaskSphere" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/icons/icon-192x192.png" />
+  
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Microsoft PWA Meta Tags -->
+  <meta name="msapplication-TileImage" content="%PUBLIC_URL%/icons/icon-144x144.png" />
+  <meta name="msapplication-TileColor" content="#60A5FA" />
+  <meta name="msapplication-config" content="%PUBLIC_URL%/browserconfig.xml" />
+  
+  <!-- Preload critical resources -->
+  <link rel="preload" href="%PUBLIC_URL%/manifest.json" as="fetch" crossorigin="anonymous" />
+  
+  <!-- Favicon variations -->
+  <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/icons/icon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/icons/icon-16x16.png" />
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="TaskSphere - Personal Task Manager" />
+  <meta property="og:description" content="Organize your tasks in spheres with priority-based color coding" />
+  <meta property="og:image" content="%PUBLIC_URL%/icons/icon-512x512.png" />
+  <meta property="og:url" content="https://yourdomain.com" />
+  
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="TaskSphere - Personal Task Manager" />
+  <meta name="twitter:description" content="Organize your tasks in spheres with priority-based color coding" />
+  <meta name="twitter:image" content="%PUBLIC_URL%/icons/icon-512x512.png" />
+  
+  <title>TaskSphere - Personal Task Manager</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Preconnect to external domains for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  
+  <style>
+    /* Custom loading screen */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #DBEAFE 0%, #ffffff 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
+    }
+    
+    .loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #E5E7EB;
+      border-top: 4px solid #60A5FA;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* PWA install prompt styles */
+    .install-prompt {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1F2937;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 25px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+    
+    .install-prompt.show {
+      display: flex;
+      animation: slideUp 0.3s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from {
+        transform: translateX(-50%) translateY(100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .install-btn {
+      background: #60A5FA;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .install-btn:hover {
+      background: #3B82F6;
+    }
+    
+    .close-btn {
+      background: transparent;
+      color: #9CA3AF;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+    }
+    
+    /* Update available notification */
+    .update-prompt {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #10B981;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+    
+    .update-prompt.show {
+      display: flex;
+      animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .update-btn {
+      background: white;
+      color: #10B981;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .update-btn:hover {
+      background: #F3F4F6;
+    }
+  </style>
+</head>
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-spinner"></div>
+    <h2 style="color: #374151; font-size: 24px; font-weight: bold; margin-bottom: 8px;">TaskSphere</h2>
+    <p style="color: #6B7280; font-size: 16px;">Loading your tasks...</p>
+  </div>
+  
+  <!-- PWA Install Prompt -->
+  <div id="install-prompt" class="install-prompt">
+    <span>📱 Install TaskSphere for a better experience!</span>
+    <button id="install-btn" class="install-btn">Install</button>
+    <button id="close-install" class="close-btn">&times;</button>
+  </div>
+  
+  <!-- Update Available Prompt -->
+  <div id="update-prompt" class="update-prompt">
+    <span>🔄 New version available!</span>
+    <button id="update-btn" class="update-btn">Update</button>
+    <button id="close-update" class="close-btn">&times;</button>
+  </div>
+  
+  <!-- React App Root -->
+  <div id="root"></div>
+  
+  <!-- Service Worker Registration -->
+  <script>
+    // PWA Install functionality
+    let deferredPrompt;
+    const installPrompt = document.getElementById('install-prompt');
+    const installBtn = document.getElementById('install-btn');
+    const closeInstallBtn = document.getElementById('close-install');
+    const updatePrompt = document.getElementById('update-prompt');
+    const updateBtn = document.getElementById('update-btn');
+    const closeUpdateBtn = document.getElementById('close-update');
+    
+    // Hide loading screen when page is fully loaded
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loadingScreen = document.getElementById('loading-screen');
+        loadingScreen.classList.add('hidden');
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+        }, 500);
+      }, 1000); // Show for at least 1 second
+    });
+    
+    // Listen for beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log('PWA: Install prompt available');
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Show install prompt after a delay
+      setTimeout(() => {
+        if (!window.matchMedia('(display-mode: standalone)').matches) {
+          installPrompt.classList.add('show');
+        }
+      }, 3000);
+    });
+    
+    // Handle install button click
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log('PWA: User choice:', outcome);
+        deferredPrompt = null;
+        installPrompt.classList.remove('show');
+      }
+    });
+    
+    // Handle close install prompt
+    closeInstallBtn.addEventListener('click', () => {
+      installPrompt.classList.remove('show');
+    });
+    
+    // Handle close update prompt
+    closeUpdateBtn.addEventListener('click', () => {
+      updatePrompt.classList.remove('show');
+    });
+    
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW: Registration successful', registration.scope);
+            
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              console.log('SW: New service worker found');
+              
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('SW: New version available');
+                  updatePrompt.classList.add('show');
+                  
+                  updateBtn.addEventListener('click', () => {
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    updatePrompt.classList.remove('show');
+                    window.location.reload();
+                  });
+                }
+              });
+            });
+          })
+          .catch((error) => {
+            console.log('SW: Registration failed', error);
+          });
+        
+        // Listen for service worker messages
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          console.log('SW: Message received from service worker', event.data);
+        });
+        
+        // Handle service worker updates
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          console.log('SW: Controller changed, reloading page');
+          window.location.reload();
+        });
+      });
+    }
+    
+    // PWA Detection
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                  window.navigator.standalone === true;
+    
+    if (isPWA) {
+      console.log('PWA: Running as installed PWA');
+      document.body.classList.add('pwa-mode');
+    }
+    
+    // Online/Offline Detection
+    function updateOnlineStatus() {
+      const status = navigator.onLine ? 'online' : 'offline';
+      console.log('PWA: Connection status:', status);
+      document.body.classList.toggle('offline', !navigator.onLine);
+      
+      // You can dispatch custom events here to notify your React app
+      window.dispatchEvent(new CustomEvent('connectionchange', { 
+        detail: { online: navigator.onLine } 
+      }));
+    }
+    
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+    
+    // Performance monitoring
+    if ('performance' in window) {
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const perfData = performance.getEntriesByType('navigation')[0];
+          console.log('PWA: Page load time:', perfData.loadEventEnd - perfData.fetchStart, 'ms');
+        }, 0);
+      });
+    }
+    
+    // Handle app shortcuts (from manifest.json)
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    if (action === 'add-task') {
+      console.log('PWA: Launched with add-task shortcut');
+      // You can dispatch an event to your React app to handle this
+      window.dispatchEvent(new CustomEvent('pwa-shortcut', { 
+        detail: { action: 'add-task' } 
+      }));
+    }
+  </script>
+  
+  <!-- React and ReactDOM from CDN (for development) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Your React Component -->
+  <script type="text/babel">
+    // Import your TaskSphereApp component here
+    // This is where you'll paste your updated React component with IndexedDB
+  </script>
+</body>
+</html>
